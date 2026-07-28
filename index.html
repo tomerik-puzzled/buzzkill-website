@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BUZZKILL — A New Type of Zombie Movie</title>
+<meta name="description" content="Buzzkill: a horror-comedy feature. Principal photography October 2026 in Ontario. Seeking additional investors.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Bangers&family=Caveat:wght@500;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0b0b0d;
+    --ink-soft:#141417;
+    --bone:#f3ede2;
+    --bone-dim:#c9c2b6;
+    --amber:#dd9a45;
+    --coral:#e28569;
+    --teal:#6d9d95;
+    --pink:#f24fc0;
+    --pink-dim:#a8397e;
+    --blood:#7c1f2a;
+    --blood-bright:#c0303f;
+    --coldblue:#31445f;
+    --scroll:0;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--ink);
+    color:var(--bone);
+    font-family:'Inter',sans-serif;
+    overflow-x:hidden;
+  }
+  ::selection{background:var(--pink);color:var(--ink);}
+
+  h1,h2,.display{
+    font-family:'Anton',sans-serif;
+    font-weight:400;
+    letter-spacing:0.01em;
+    line-height:0.95;
+    text-transform:uppercase;
+  }
+  .eyebrow{
+    font-family:'Bangers',cursive;
+    letter-spacing:0.06em;
+    color:var(--pink);
+    font-size:1.5rem;
+    text-transform:uppercase;
+  }
+  .scrawl{
+    font-family:'Caveat',cursive;
+    font-weight:700;
+  }
+
+  a{color:inherit;}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px;}
+  section{position:relative;padding:120px 0;}
+
+  /* ---------- NAV ---------- */
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:100;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:18px 24px;
+    background:linear-gradient(to bottom, rgba(11,11,13,0.92), rgba(11,11,13,0));
+    backdrop-filter:blur(2px);
+  }
+  nav .brand{font-family:'Anton',sans-serif;font-size:1.3rem;letter-spacing:0.03em;color:var(--pink);text-decoration:none;}
+  nav ul{list-style:none;display:flex;gap:28px;margin:0;padding:0;}
+  nav a{text-decoration:none;font-size:0.85rem;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:var(--bone-dim);transition:color .2s;}
+  nav a:hover{color:var(--pink);}
+  #navToggle{display:none;}
+  @media(max-width:720px){
+    nav ul{display:none;}
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    min-height:100vh;
+    display:flex;
+    align-items:flex-end;
+    padding:0;
+    background:#000;
+  }
+  .hero-inner{
+    position:relative;width:100%;
+    display:grid;grid-template-columns:1.1fr 1fr;
+    align-items:stretch;
+  }
+  .hero-art{
+    position:relative;
+    min-height:100vh;
+    background:url('assets/poster.jpg') center 15% / cover no-repeat;
+  }
+  .hero-art::after{
+    content:'';position:absolute;inset:0;
+    background:linear-gradient(to right, rgba(11,11,13,0) 55%, rgba(11,11,13,1) 100%),
+               linear-gradient(to top, rgba(11,11,13,0.85), rgba(11,11,13,0) 40%);
+  }
+  .hero-text{
+    display:flex;flex-direction:column;justify-content:flex-end;
+    padding:60px 48px 90px 40px;
+    min-height:100vh;
+  }
+  .hero-text .eyebrow{font-size:1.1rem;margin-bottom:8px;}
+  .hero-text h1{
+    font-size:clamp(3.2rem, 8vw, 6rem);
+    color:var(--bone);
+    margin:0 0 18px;
+  }
+  .hero-text h1 span{color:var(--pink);}
+  .hero-tagline{
+    font-size:1.15rem;color:var(--bone-dim);max-width:32ch;margin:0 0 30px;
+  }
+  .hero-meta{
+    display:flex;gap:22px;flex-wrap:wrap;margin-bottom:36px;
+    font-size:0.82rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--bone-dim);
+  }
+  .hero-meta b{color:var(--bone);}
+  .cta-row{display:flex;gap:16px;flex-wrap:wrap;}
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:14px 26px;border-radius:2px;
+    font-weight:700;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.05em;
+    text-decoration:none;border:2px solid transparent;transition:transform .15s ease, background .2s;
+  }
+  .btn-primary{background:var(--pink);color:#12040d;}
+  .btn-primary:hover{transform:translateY(-2px);background:#ff6bd0;}
+  .btn-ghost{border-color:var(--bone-dim);color:var(--bone);}
+  .btn-ghost:hover{border-color:var(--pink);color:var(--pink);transform:translateY(-2px);}
+  @media(max-width:900px){
+    .hero-inner{grid-template-columns:1fr;}
+    .hero-art{min-height:60vh;}
+    .hero-art::after{background:linear-gradient(to top, rgba(11,11,13,1) 10%, rgba(11,11,13,0.2) 60%);}
+    .hero-text{min-height:auto;padding:36px 22px 56px;}
+  }
+
+  /* ---------- DAY / NIGHT DUALITY ENGINE ---------- */
+  /* body background tints gradually via CSS var set by JS scroll progress */
+  .duality-bg{
+    position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background: radial-gradient(ellipse at 20% 0%, color-mix(in srgb, var(--amber) calc(var(--scroll) * -1% + 22%), transparent) 0%, transparent 55%),
+                radial-gradient(ellipse at 80% 100%, color-mix(in srgb, var(--blood) calc(var(--scroll) * 1%), transparent) 0%, transparent 60%);
+    transition:background 0.1s linear;
+  }
+
+  .eyebrow-line{display:flex;align-items:center;gap:14px;margin-bottom:28px;}
+  .eyebrow-line .rule{flex:1;height:2px;background:linear-gradient(to right, var(--pink), transparent);}
+
+  /* ---------- CONCEPT ---------- */
+  #concept{background:linear-gradient(180deg, var(--ink) 0%, var(--ink-soft) 100%);}
+  .concept-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:60px;align-items:center;}
+  .concept-grid h2{font-size:clamp(2rem,4vw,2.8rem);margin:0 0 20px;color:var(--bone);}
+  .concept-grid p{font-size:1.15rem;line-height:1.6;color:var(--bone-dim);margin:0;}
+  .concept-badge{
+    border:1px solid var(--bone-dim);padding:26px;border-radius:2px;
+    font-size:0.85rem;color:var(--bone-dim);line-height:1.8;
+  }
+  .concept-badge b{color:var(--amber);display:block;font-family:'Anton',sans-serif;font-size:1.4rem;text-transform:uppercase;margin-bottom:4px;}
+  @media(max-width:800px){.concept-grid{grid-template-columns:1fr;gap:30px;}}
+
+  /* ---------- VIDEO ---------- */
+  #video{background:var(--ink-soft);}
+  .video-frame{
+    position:relative;padding-top:56.25%;height:0;overflow:hidden;
+    border:1px solid rgba(243,237,226,0.15);
+    box-shadow:0 30px 80px rgba(0,0,0,0.6);
+  }
+  .video-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
+  .video-caption{margin-top:18px;color:var(--bone-dim);font-size:0.95rem;}
+
+  /* ---------- STORY ---------- */
+  #story{background:var(--ink);}
+  .story-cols{display:grid;grid-template-columns:1fr 1fr;gap:40px 60px;}
+  .story-cols p{color:var(--bone-dim);line-height:1.75;font-size:1.02rem;}
+  @media(max-width:800px){.story-cols{grid-template-columns:1fr;}}
+  details.story-toggle{margin-top:20px;}
+  details.story-toggle summary{cursor:pointer;color:var(--pink);font-weight:700;list-style:none;font-size:0.9rem;text-transform:uppercase;letter-spacing:0.04em;}
+  details.story-toggle summary::-webkit-details-marker{display:none;}
+  details.story-toggle summary::before{content:'+ ';}
+  details.story-toggle[open] summary::before{content:'– ';}
+
+  /* ---------- VISUAL LANGUAGE / TWO HALVES ---------- */
+  #look{padding-bottom:0;}
+  .halves{display:grid;grid-template-columns:1fr 1fr;min-height:640px;border-top:1px solid rgba(243,237,226,0.12);}
+  .half{position:relative;padding:70px 40px;overflow:hidden;}
+  .half-day{background:linear-gradient(160deg, #2c2114, #1a140c);}
+  .half-night{background:linear-gradient(200deg, #150c14, #0b0b0d);}
+  .half h3{font-family:'Bangers',cursive;font-size:2rem;letter-spacing:0.03em;margin:0 0 18px;}
+  .half-day h3{color:var(--amber);}
+  .half-night h3{color:var(--blood-bright);}
+  .half p{color:var(--bone-dim);line-height:1.7;font-size:0.98rem;max-width:44ch;}
+  .half-imgs{display:flex;gap:14px;margin-top:30px;}
+  .half-imgs img{width:100%;height:130px;object-fit:cover;border-radius:2px;filter:saturate(0.9);}
+  .half-day .half-imgs img{filter:sepia(0.15) saturate(1.05);}
+  .half-night .half-imgs img{filter:grayscale(0.25) contrast(1.1) brightness(0.85);}
+  @media(max-width:800px){.halves{grid-template-columns:1fr;}}
+
+  /* ---------- GALLERY STRIP ---------- */
+  .gallery-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:#000;}
+  .gallery-strip img{width:100%;height:280px;object-fit:cover;display:block;filter:grayscale(0.2);transition:filter .3s;}
+  .gallery-strip img:hover{filter:none;}
+  @media(max-width:700px){.gallery-strip{grid-template-columns:1fr 1fr;}}
+
+  /* ---------- INVEST ---------- */
+  #invest{background:linear-gradient(180deg, var(--ink-soft), #16090c 100%);}
+  .invest-grid{display:grid;grid-template-columns:1fr 1fr;gap:50px;}
+  .invest-card{
+    border:1px solid rgba(192,48,63,0.4);background:rgba(124,31,42,0.08);
+    padding:28px;border-radius:2px;
+  }
+  .invest-card h4{font-family:'Anton',sans-serif;text-transform:uppercase;color:var(--blood-bright);font-size:1.1rem;margin:0 0 14px;}
+  .invest-card p, .invest-card li{color:var(--bone-dim);font-size:0.95rem;line-height:1.65;}
+  .comps-table{width:100%;border-collapse:collapse;font-size:0.85rem;margin-top:10px;}
+  .comps-table th,.comps-table td{text-align:left;padding:8px 10px;border-bottom:1px solid rgba(243,237,226,0.1);color:var(--bone-dim);}
+  .comps-table th{color:var(--bone);font-weight:700;text-transform:uppercase;font-size:0.72rem;letter-spacing:0.05em;}
+  .stat-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px dashed rgba(243,237,226,0.15);font-size:0.95rem;}
+  .stat-row b{color:var(--bone);}
+  @media(max-width:800px){.invest-grid{grid-template-columns:1fr;}}
+
+  /* ---------- TEAM ---------- */
+  #team{background:#0b0b0d;}
+  .team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:34px;}
+  .team-card img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:2px;filter:grayscale(0.4);margin-bottom:18px;}
+  .team-card h4{font-family:'Anton',sans-serif;text-transform:uppercase;font-size:1.2rem;margin:0 0 2px;color:var(--bone);}
+  .team-card .role{color:var(--pink);font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;margin-bottom:12px;display:block;}
+  .team-card p{color:var(--bone-dim);font-size:0.92rem;line-height:1.6;}
+  @media(max-width:800px){.team-grid{grid-template-columns:1fr;max-width:420px;margin:0 auto;}}
+
+  /* ---------- TIMELINE ---------- */
+  #timeline{background:#0b0b0d;padding-top:0;}
+  .tl{display:flex;flex-wrap:wrap;gap:0;border-top:1px solid rgba(243,237,226,0.12);border-bottom:1px solid rgba(243,237,226,0.12);}
+  .tl-item{flex:1;min-width:150px;padding:26px 20px;border-right:1px solid rgba(243,237,226,0.12);}
+  .tl-item:last-child{border-right:none;}
+  .tl-item .m{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--pink);margin-bottom:6px;}
+  .tl-item .d{font-family:'Anton',sans-serif;font-size:1rem;color:var(--bone);text-transform:uppercase;}
+
+  /* ---------- CONTACT / FOOTER ---------- */
+  #contact{
+    text-align:center;padding:140px 0 60px;
+    background:radial-gradient(ellipse at 50% 0%, rgba(124,31,42,0.35), transparent 60%);
+  }
+  #contact .scrawl{font-size:clamp(1.6rem,3.4vw,2.4rem);color:var(--bone);display:block;max-width:20ch;margin:0 auto 40px;line-height:1.3;}
+  .contact-btns{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-bottom:70px;}
+  footer{text-align:center;color:var(--bone-dim);font-size:0.8rem;padding-bottom:40px;}
+  footer a{color:var(--bone-dim);text-decoration:underline;}
+  footer a:hover{color:var(--pink);}
+</style>
+</head>
+<body>
+
+<div class="duality-bg" aria-hidden="true"></div>
+
+<nav>
+  <a href="#top" class="brand">BUZZKILL</a>
+  <ul>
+    <li><a href="#concept">Concept</a></li>
+    <li><a href="#story">Story</a></li>
+    <li><a href="#look">The Look</a></li>
+    <li><a href="#invest">Invest</a></li>
+    <li><a href="#team">Team</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<section class="hero" id="top">
+  <div class="hero-inner">
+    <div class="hero-art" role="img" aria-label="Buzzkill poster art: a woman's terrified face surrounded by reaching hands"></div>
+    <div class="hero-text">
+      <div class="eyebrow">A New Type of Zombie Movie</div>
+      <h1>BUZZ<span>KILL</span></h1>
+      <p class="hero-tagline">A blood-soaked cautionary tale about the high we're all chasing — and what it costs when we catch it.</p>
+      <div class="hero-meta">
+        <div>Genre <b>Horror-Comedy</b></div>
+        <div>Shooting <b>Ontario · Oct 2026</b></div>
+        <div>Status <b>Seeking Investors</b></div>
+      </div>
+      <div class="cta-row">
+        <a href="#video" class="btn btn-primary">Watch the Proof of Concept</a>
+        <a href="#contact" class="btn btn-ghost">Investor Inquiries</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="concept">
+  <div class="wrap">
+    <div class="concept-grid">
+      <div>
+        <div class="eyebrow-line"><span class="eyebrow" style="font-size:1.1rem;">The Concept</span><span class="rule"></span></div>
+        <h2>Friendship over fear.<br>Or the virus wins.</h2>
+        <p>Ten years in the future, at a remote college house party, a group of friends chase a euphoric high with a risky new drug made from zombie saliva — only to discover the antidotes keeping them human have been compromised. Trapped and unraveling, they have to rely on each other, or risk turning before the virus does.</p>
+      </div>
+      <div class="concept-badge">
+        <b>104pg</b> Fourth draft, feature-length
+        <br><br>
+        <b>13</b> Principal cast, ensemble-driven
+        <br><br>
+        <b>$340K</b> All-in Ontario budget
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="video">
+  <div class="wrap">
+    <div class="eyebrow-line"><span class="eyebrow" style="font-size:1.1rem;">Proof of Concept</span><span class="rule"></span></div>
+    <div class="video-frame">
+      <iframe src="https://www.youtube.com/embed/JQlfxjPamZQ" title="Buzzkill Proof of Concept" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+    <p class="video-caption">A short proof-of-concept shot ahead of principal photography, showing the tone, cast, and world of Buzzkill. <a href="https://youtu.be/JQlfxjPamZQ" target="_blank" rel="noopener" style="color:var(--pink);font-weight:600;">Watch on YouTube ↗</a></p>
+  </div>
+</section>
+
+<section id="story">
+  <div class="wrap">
+    <div class="eyebrow-line"><span class="eyebrow" style="font-size:1.1rem;">The Story</span><span class="rule"></span></div>
+    <div class="story-cols">
+      <p>In 2035, stepsisters Joni and Samira, along with exchange student Ramon, head to a secluded country house for what promises to be an unforgettable party. The surprise comes when Rusty, a reckless outsider, arrives with a chained zombie — the guests plan to extract its saliva, a banned drug that delivers euphoric, transcendent highs.</p>
+      <p>Nine years after a contained zombie outbreak, an antidote exists, but users must inject it within hours of the high to avoid turning. Persuaded by Joni, Samira joins in as the group ties up the zombie and begins their trip. Each spirals into personal bliss or chaos, leaving Ramon — immune to the drug — to supervise. But when Betty, the host's cousin, fends off an assault and accidentally frees the zombie, the night descends into horror.</p>
+      <details class="story-toggle">
+        <summary>Continue reading</summary>
+        <p>Joni and Samira return from their high to find their friends fighting for their lives. Several are bitten, accelerating their transformations. In the chaos, half the antidotes are destroyed, leaving too few to save everyone. Panic erupts as the survivors argue, manipulate, and betray one another to secure a dose. What begins as moral debate devolves into violent contests for survival.</p>
+        <p>Alliances crumble and the house becomes a slaughterhouse. As the zombies close in, Joni and Samira cling to each other, only to realize they've run out of time and antidote. Facing inevitable transformation, they seal themselves in a car to end their lives peacefully — until they hear banging from the trunk. It's Rusty, still alive, claiming to know where to find more antidotes.</p>
+      </details>
+      <details class="story-toggle">
+        <summary>The ending</summary>
+        <p>Their last hope takes them to a suburban dealer's stash. The sisters inject themselves just as Rusty turns, slaughtering the dealer and unleashing the infection into the neighborhood. As the quiet streets erupt into chaos, Joni and Samira drive off into the night alive — having caused another devastating outbreak.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section id="look">
+  <div class="wrap">
+    <div class="eyebrow-line"><span class="eyebrow" style="font-size:1.1rem;">Vision &amp; Visual Language</span><span class="rule"></span></div>
+    <p style="color:var(--bone-dim);max-width:60ch;line-height:1.7;margin-bottom:0;">Buzzkill is a movie of two halves — the audience falls in love with these characters before the fractures appear, feeling both the intimacy of friendship and the cruelty of its collapse.</p>
+  </div>
+  <div class="halves">
+    <div class="half half-day">
+      <h3>Day / Before</h3>
+      <p>Hope, teenage thrills, and romance, with a dreamy nostalgic quality drawn from '90s indie dramedies. Pinks, golden sunlight, late-summer orange, and soft teal. The camera flirts with the audience on steadicam; cicadas and rustling trees fill the soundscape.</p>
+      <div class="half-imgs">
+        <img src="assets/still-speculum.jpg" alt="A character grins while holding a strange prop, floral shirt, warm lamplight">
+        <img src="assets/still-friends.jpg" alt="A tense group of friends in a living room">
+      </div>
+    </div>
+    <div class="half half-night">
+      <h3>Night / After</h3>
+      <p>Summer fades into night, and vibrant warmth gives way to cold blues and dark reds. Shadows grow harsh. The camera becomes a passive observer — locked off, or moving with tension-building dolly shots. Horror lurks just out of frame. Polarization and betrayal take center stage.</p>
+      <div class="half-imgs">
+        <img src="assets/still-wiredmouth.jpg" alt="Close-up of zombie makeup with a wired jaw restraint">
+        <img src="assets/still-bag.jpg" alt="A restrained figure with a bag pulled over their head">
+      </div>
+    </div>
+  </div>
+  <div class="gallery-strip">
+    <img src="assets/still-necklace.jpg" alt="A woman in a dark room, worried expression">
+    <img src="assets/still-friends.jpg" alt="Friends confronting something unseen">
+    <img src="assets/still-bag.jpg" alt="Tense restraint scene">
+  </div>
+</section>
+
+<section id="invest">
+  <div class="wrap">
+    <div class="eyebrow-line"><span class="eyebrow" style="font-size:1.1rem;">Why Invest</span><span class="rule"></span></div>
+    <p style="color:var(--bone-dim);max-width:70ch;line-height:1.7;">Contemporary horror continues to perform well at genre festivals and in the streaming marketplace. Buzzkill is built to hit the commercial sweet spot: a recognizable, highly marketable concept with a fresh comedic and satirical twist, produced on a contained-location, ensemble-cast budget that keeps downside limited.</p>
+    <div class="invest-grid">
+      <div class="invest-card">
+        <h4>Snapshot</h4>
+        <div class="stat-row"><span>Total budget</span><b>$340,000 CAD</b></div>
+        <div class="stat-row"><span>Ontario tax credit (est.)</span><b>~$90,000</b></div>
+        <div class="stat-row"><span>Private equity raised so far</span><b>$120,000</b></div>
+        <div class="stat-row"><span>Remaining equity sought</span><b>$130,000</b></div>
+        <div class="stat-row" style="border-bottom:none;"><span>Recoupment</span><b>100% to investors, then 50/50</b></div>
+      </div>
+      <div class="invest-card">
+        <h4>Recent Comparables</h4>
+        <table class="comps-table">
+          <tr><th>Film</th><th>Budget → Sold</th><th>Outcome</th></tr>
+          <tr><td>Host</td><td>$100K → $1.1M</td><td>Shudder, global</td></tr>
+          <tr><td>Deadstream</td><td>$300K → $1.0M</td><td>Sundance, Shudder</td></tr>
+          <tr><td>Scare Me</td><td>$250K → $0.7M</td><td>Sundance, Shudder</td></tr>
+          <tr><td>Undertone</td><td>$300K → $4.0M</td><td>Fantasia, A24</td></tr>
+        </table>
+      </div>
+    </div>
+    <p style="color:var(--bone-dim);margin-top:36px;font-size:0.9rem;">Full financing plan, ROI waterfall, and screenplay available on request.</p>
+  </div>
+</section>
+
+<section id="timeline">
+  <div class="wrap" style="padding-bottom:20px;">
+    <div class="eyebrow-line"><span class="eyebrow" style="font-size:1.1rem;">Timeline</span><span class="rule"></span></div>
+  </div>
+  <div class="tl">
+    <div class="tl-item"><div class="m">Now</div><div class="d">Financing</div></div>
+    <div class="tl-item"><div class="m">Jul–Sep 2026</div><div class="d">Pre-Production</div></div>
+    <div class="tl-item"><div class="m">Oct 2026</div><div class="d">Production</div></div>
+    <div class="tl-item"><div class="m">Oct '26–Jan '27</div><div class="d">Picture Edit</div></div>
+    <div class="tl-item"><div class="m">Jan–Apr 2027</div><div class="d">SFX / VFX / Music</div></div>
+    <div class="tl-item"><div class="m">May 2027</div><div class="d">Markets &amp; Festivals</div></div>
+  </div>
+</section>
+
+<section id="team">
+  <div class="wrap">
+    <div class="eyebrow-line"><span class="eyebrow" style="font-size:1.1rem;">Meet the Team</span><span class="rule"></span></div>
+    <div class="team-grid">
+      <div class="team-card">
+        <img src="assets/team-tomerik.jpg" alt="Tom Erik Rossavik">
+        <h4>Tom Erik Rossavik</h4>
+        <span class="role">Director &amp; Writer</span>
+        <p>Leads the creative vision of Buzzkill, overseeing tone, performances, and execution from script through post. Previously co-created "Tom Versus Tom" (Funny or Die) and directed "The Great Eggscape."</p>
+      </div>
+      <div class="team-card">
+        <img src="assets/team-tomdahl.jpg" alt="Tom Dahl">
+        <h4>Tom Dahl</h4>
+        <span class="role">Writer &amp; Producer</span>
+        <p>Co-wrote Buzzkill and works as creative producer aiding production logistics. A 20+ year veteran of the theatre stage and co-creator of "Tom Versus Tom."</p>
+      </div>
+      <div class="team-card">
+        <img src="assets/team-florence.jpg" alt="Florence Gaven Rossavik">
+        <h4>Florence Gaven Rossavik</h4>
+        <span class="role">Co-Producer</span>
+        <p>Film veteran and business owner. Co-founder of Fuzz Wax Bar, a coast-to-coast beauty franchise, and a former IATSE camera operator.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="wrap">
+    <span class="scrawl">"Buzzkill is a genre-smashing, blood-soaked cautionary tale about the high we're all chasing, and what it costs when we catch it."</span>
+    <div class="contact-btns">
+      <a href="mailto:hello@buzzkillmovie.com?subject=Buzzkill%20Inquiry" class="btn btn-primary">Get in Touch</a>
+      <a href="mailto:hello@buzzkillmovie.com?subject=Buzzkill%20-%20Requesting%20Full%20Deck" class="btn btn-ghost">Request Full Deck</a>
+    </div>
+  </div>
+  <footer>
+    &copy; 2026 Buzzkill Productions. All rights reserved.
+  </footer>
+</section>
+
+<script>
+  // Day-to-night duality: tie a CSS variable to scroll progress across the story/look sections
+  const dualityStart = document.getElementById('story');
+  const dualityEnd = document.getElementById('invest');
+  function updateDuality(){
+    if(!dualityStart || !dualityEnd) return;
+    const startY = dualityStart.offsetTop;
+    const endY = dualityEnd.offsetTop + dualityEnd.offsetHeight * 0.4;
+    const y = window.scrollY + window.innerHeight * 0.5;
+    let progress = (y - startY) / (endY - startY);
+    progress = Math.max(0, Math.min(1, progress));
+    document.documentElement.style.setProperty('--scroll', progress.toFixed(3));
+  }
+  window.addEventListener('scroll', updateDuality, {passive:true});
+  window.addEventListener('resize', updateDuality);
+  updateDuality();
+</script>
+
+</body>
+</html>
